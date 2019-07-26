@@ -1,1 +1,2 @@
-# scheduler
+# Scheduler
+Operating Systems first assignment
