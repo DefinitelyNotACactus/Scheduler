@@ -25,9 +25,12 @@ public class PriorityQueue implements Queue {
     @Override
     public boolean enqueue(Process target) {
         if(!isFull()) {
-            data[size] = target;
+            int index = findPosition(target.getBurstTime());
+            for(int i = size; i > index; i--) {
+                data[i] = data[i-1];
+            }
+            data[index] = target;
             size++;
-            sort();
             return true;
         }
         return false;
@@ -47,21 +50,12 @@ public class PriorityQueue implements Queue {
         return null; // structures.Queue is empty
     }
 
-    public void sort() {
-        boolean sorted = false;
-        int n = size;
-        Process aux;
-        while(!sorted) {
-            n--;
-            sorted = true;
-            for(int i = 0; i < n; i++){
-                if(data[i].getBurstTime() > data[i+1].getBurstTime()) {
-                    sorted = false;
-                    aux = data[i];
-                    data[i] = data[i+1];
-                    data[i+1] = aux;
-                }
+    private int findPosition(int burstTime) {
+        for(int i = 0; i < size; i++) {
+            if(burstTime < data[i].getBurstTime()) {
+                return i;
             }
         }
+        return size;
     }
 }
