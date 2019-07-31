@@ -1,6 +1,6 @@
 package data;
 
-public class Process {
+public class Process implements Cloneable {
 
     private final int arrivalTime;
     private int burstTime;
@@ -72,5 +72,9 @@ public class Process {
 
     public void setLastExecutionTime(int lastExecutionTime) {
         this.lastExecutionTime = lastExecutionTime;
+    }
+
+    public Object clone() throws CloneNotSupportedException {
+        return super.clone();
     }
 }

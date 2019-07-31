@@ -20,8 +20,8 @@ public class Cpu {
     }
 
     public void cpuExecute() {
+        scheduler.checkForProcesses(0);
         while(scheduler.hasProcessesLeft() || !scheduler.isQueueEmpty() || hasProcess()) {
-            scheduler.checkForProcesses(currentTime);
             if(!hasProcess() && !scheduler.isQueueEmpty()) { // Current process changed
                 currentProcess = scheduler.getNextProcess();
                 if(currentProcess.isFirstTime()) {
@@ -30,15 +30,29 @@ public class Cpu {
                 currentProcess.updateWaitingTime(currentTime);
             }
             currentTime++;
+            scheduler.checkForProcesses(currentTime);
             if(hasProcess()) {
                 currentProcess.decrementBurstTime();
-                if(currentProcess.getBurstTime() == 0) {
+                if(currentProcess.getBurstTime() == 0) { // Current process has ended
                     currentProcess.setTurnaroundTime(currentTime);
                     scheduler.updateStats(currentProcess);
                     currentProcess = null;
+                } else {
+                    scheduler.updateStatus();
                 }
             }
         }
         scheduler.printStats();
+    }
+
+    public Process preempt() {
+        Process p = currentProcess;
+        currentProcess = null;
+        p.setLastExecutionTime(currentTime);
+        return p;
+    }
+
+    public Process getCurrentProcess() {
+        return currentProcess;
     }
 }

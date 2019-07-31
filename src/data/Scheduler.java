@@ -1,6 +1,7 @@
 package data;
 
-import structures.FcfsQueue;
+import structures.CircularQueue;
+import structures.PriorityQueue;
 import structures.Queue;
 
 import java.io.BufferedReader;
@@ -13,6 +14,9 @@ import java.util.List;
 
 public class Scheduler {
     private int mode;
+    private int quantum;
+    private int counter;
+
     private Queue processQueue;
     private List<Process> processList;
     private final Cpu cpu;
@@ -26,13 +30,15 @@ public class Scheduler {
         this.mode = mode;
         switch (mode) {
             case 0: // FCFS
-                processQueue = new FcfsQueue();
+                processQueue = new CircularQueue();
                 break;
             case 1: // SJF
-                //TODO
+                processQueue = new PriorityQueue();
                 break;
             case 2: // RR
-                //TODO
+                quantum = 2;
+                counter = 0;
+                processQueue = new CircularQueue();
                 break;
         }
 
@@ -60,7 +66,9 @@ public class Scheduler {
                 numberOfProcesses++;
             }
         } catch(IOException ex) {
-            System.out.println("Error while parsing file");
+            System.out.println("Error while parsing file: ");
+            ex.printStackTrace();
+            System.exit(1);
         }
     }
 
@@ -94,6 +102,24 @@ public class Scheduler {
         totalResponseTime += source.getResponseTime();
         totalTurnaroundTime += source.getTurnaroundTime();
         totalWaitTime += source.getWaitingTime();
+        if(mode == 2) { // Reset quantum
+            counter = 0;
+        }
+    }
+
+    public void updateStatus() {
+        if(mode != 0) {
+            switch (mode) {
+                case 2:
+                    counter++;
+                    if (counter == quantum) {
+                        Process p = cpu.preempt();
+                        processQueue.enqueue(p);
+                        counter = 0;
+                    }
+                break;
+            }
+        }
     }
 
     public String toString() {
@@ -118,7 +144,9 @@ public class Scheduler {
     }
 
     public static void main(String[] args) {
-        new Scheduler(0);
+        new Scheduler(0); //FCFS
+        new Scheduler(1); //SJF
+        new Scheduler(2); //RR
     }
 
 }

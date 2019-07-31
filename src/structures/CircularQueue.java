@@ -2,7 +2,7 @@ package structures;
 
 import data.Process;
 
-public class FcfsQueue implements Queue {
+public class CircularQueue implements Queue {
 
     private Process[] data;
     private int capacity;
@@ -10,7 +10,7 @@ public class FcfsQueue implements Queue {
     private int frontIndex;
     private int backIndex;
 
-    public FcfsQueue() {
+    public CircularQueue() {
         data = new Process[100];
         capacity = data.length;
         size = 0;
